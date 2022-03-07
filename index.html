@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            border: 1px solid black;
+            width: 90%;
+            height: 90%;
+        }
+        #filter {
+            position: absolute;
+            opacity: 0.6;
+            background-color: black;
+            width: 90%;
+            height: 90%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #play-button {
+            background-color: orange;
+            padding: 15px;
+            border: none;
+            font-size: 30px;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+        #play-button:hover {
+            background-color: rgb(199, 129, 0)
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <canvas id="canvas"></canvas>
+        <div id="filter">
+            <button id="play-button" onclick="start()">Play</button>
+        </div>
+    </div>
+</body>
+<script src="game.js"></script>
+
+</html>

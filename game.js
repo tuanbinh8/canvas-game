@@ -132,12 +132,26 @@ class Object extends Component {
         this.y += this.speedY + this.gravitySpeed;
         // this.y += this.speedY
         this.hitBottom()
+        this.hitLeftSide()
+        this.hitRightSide()
         enemyAI()
     }
     hitBottom() {
         if (this.y > 105) {
             this.y = 105;
             this.gravitySpeed = 0
+        }
+    }
+    hitLeftSide() {
+        let left = this.x
+        if (left < 0) {
+            this.x = 0
+        }
+    }
+    hitRightSide() {
+        let right = this.x + this.width
+        if (right > 300) {
+            this.x = 300 - this.width
         }
     }
     moveUp(speed) {

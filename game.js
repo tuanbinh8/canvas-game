@@ -2,9 +2,13 @@ let components = []
 let objects = []
 let player
 let playerHP
+let playerSpeed
+let playerJumpSpeed
 let playerHPDisplayer
 let enemy
 let enemyHP
+let enemySpeed
+let enemyJumpSpeed
 let enemyHPDisplayer
 let timeLeft
 let timeLeftDisplayer
@@ -13,9 +17,16 @@ let ground
 function start() {
     gameArea.start()
     player = new Object('rect', 0, 50, 20, 20, 'red');
+    playerHP = 10
+    playerSpeed = 2
+    playerJumpSpeed = 2.5
     playerHPDisplayer = new Component('text', 5, 15, '10px', 'Consolas', 'black')
     enemy = new Object('rect', 270, 50, 20, 20, 'black');
+    enemyHP = 10
+    enemySpeed = 1
+    enemyJumpSpeed = 1.5
     enemyHPDisplayer = new Component('text', 5, 35, '10px', 'Consolas', 'black')
+    timeLeft = 60
     timeLeftDisplayer = new Component('text', 220, 15, '10px', 'Consolas', 'black')
     ground = new Component('rect', 0, 120, 300, 30, 'green')
     components.push(ground)
@@ -35,9 +46,6 @@ let gameArea = {
         // this.canvas.width = 300;
         // this.canvas.height = 150;
         this.interval = setInterval(updateGameArea, 10);
-        timeLeft = 60
-        playerHP = 10
-        enemyHP = 10
         this.timeInterval = setInterval(() => {
             timeLeft--
         }, 1000);
@@ -171,31 +179,31 @@ function drawBackground(type, color) {
 
 function enemyAI() {
     if (enemy.x < player.x)
-        enemy.moveRight(1)
+        enemy.moveRight(enemySpeed)
     if (enemy.x > player.x)
-        enemy.moveLeft(1)
+        enemy.moveLeft(enemySpeed)
     if (enemy.y > player.y)
-        enemy.moveUp(1.5)
+        enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
-        enemy.moveDown(1.5)
+        enemy.moveDown(enemyJumpSpeed)
 }
 
 function updateGameArea() {
     if (player.touchWith(enemy)) {
         player.x = 0
-        player.y = 0
+        player.y = 50
         enemy.x = 270
-        enemy.y = 0
+        enemy.y = 50
         playerHP--
     }
     gameArea.clear();
     drawBackground('rect', 'lightblue')
     player.speedX = 0;
     player.speedY = 0;
-    if (gameArea.keys && gameArea.keys[37]) { player.moveLeft(2) }
-    if (gameArea.keys && gameArea.keys[39]) { player.moveRight(2) }
-    if (gameArea.keys && gameArea.keys[38]) { player.moveUp(2.5) }
-    if (gameArea.keys && gameArea.keys[40]) { player.moveDown(2.5) }
+    if (gameArea.keys && gameArea.keys[37]) { player.moveLeft(playerSpeed) }
+    if (gameArea.keys && gameArea.keys[39]) { player.moveRight(playerSpeed) }
+    if (gameArea.keys && gameArea.keys[38]) { player.moveUp(playerJumpSpeed) }
+    if (gameArea.keys && gameArea.keys[40]) { player.moveDown(playerJumpSpeed) }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
     playerHPDisplayer.text = `player HP: ${playerHP}`
     enemyHPDisplayer.text = `enemy HP: ${enemyHP}`

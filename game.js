@@ -12,9 +12,9 @@ let ground
 
 function start() {
     gameArea.start()
-    player = new Object('rect', 0, 0, 20, 20, 'red');
+    player = new Object('rect', 0, 50, 20, 20, 'red');
     playerHPDisplayer = new Component('text', 5, 15, '10px', 'Consolas', 'black')
-    enemy = new Object('rect', 270, 0, 20, 20, 'black');
+    enemy = new Object('rect', 270, 50, 20, 20, 'black');
     enemyHPDisplayer = new Component('text', 5, 35, '10px', 'Consolas', 'black')
     timeLeftDisplayer = new Component('text', 220, 15, '10px', 'Consolas', 'black')
     ground = new Component('rect', 0, 120, 300, 30, 'green')

@@ -4,13 +4,14 @@ let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDispla
 let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer
 let timeLeft, timeLeftDisplayer
 let ground
+
 function start() {
     gameArea.start()
     player = new Character('rect', 0, 50, 20, 20, 'red', 'player');
     do {
         playerName = prompt('Enter your name')
     }
-    while (playerName == '');
+    while (playerName == '' || !playerName);
     playerNameDisplayer = new Component('text', 0, 0, '5px', 'Consolas', 'red')
     playerHP = 10
     playerSpeed = 2
@@ -20,7 +21,11 @@ function start() {
     do {
         enemyName = prompt('Enter your enemy name')
     }
-    while (enemyName == '');
+    while (enemyName == '' || !enemyName);
+    if (playerName == enemyName) {
+        playerName += ' (player)'
+        enemyName += ' (enemy)'
+    }
     enemyNameDisplayer = new Component('text', 0, 0, '5px', 'Consolas', 'black')
     enemyHP = 10
     enemySpeed = 1
@@ -59,13 +64,14 @@ let gameArea = {
         window.onkeyup = (event) => {
             gameArea.keys[event.keyCode] = (event.type == "keydown");
         }
-        // this.canvas.onmousedown = (event) => {
-        //     let rect = gameArea.canvas.getBoundingClientRect();
-        //     gameArea.mouseX = event.clientX - rect.left;
-        //     gameArea.mouseY = event.clientY - rect.top;
-        //     console.log(gameArea.mouseX)
-        //     console.log(gameArea.mouseY);;
-        // }
+        this.canvas.onmousedown = (event) => {
+            gameArea.mouseX = event.clientX - gameArea.canvas.offsetLeft
+            gameArea.mouseY = event.clientY - gameArea.canvas.offsetTop
+        }
+        this.canvas.onmouseup = () => {
+            gameArea.mouseX = undefined
+            gameArea.mouseY = undefined
+        }
     },
     clear: function () {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -107,17 +113,17 @@ class Component {
             this.ctx.fillText(this.text, this.x, this.y);
         }
     }
-    // clicked() {
-    //     let myleft = this.x;
-    //     let myright = this.x + (this.width);
-    //     let mytop = this.y;
-    //     let mybottom = this.y + (this.height);
-    //     let clicked = true;
-    //     if ((mybottom < gameArea.mouseY) || (mytop > gameArea.mouseY) || (myright < gameArea.mouseX) || (myleft > gameArea.mouseX)) {
-    //         clicked = false;
-    //     }
-    //     return clicked;
-    // }
+    clicked() {
+        let myleft = this.x;
+        let myright = this.x + (this.width);
+        let mytop = this.y;
+        let mybottom = this.y + (this.height);
+        let clicked = false;
+        if ((mybottom >= gameArea.mouseY) || (mytop <= gameArea.mouseY) || (myright >= gameArea.mouseX) || (myleft <= gameArea.mouseX)) {
+            clicked = true;
+        }
+        return clicked;
+    }
     touchWith(otherobj) {
         let myleft = this.x;
         let myright = this.x + (this.width);
@@ -213,6 +219,9 @@ function updateGameArea() {
         enemy.y = 50
         playerHP--
     }
+    // if (enemy.clicked()) {
+    //     enemyHP--
+    // }
     gameArea.clear();
     drawBackground('rect', 'lightblue')
     player.speedX = 0;
@@ -231,9 +240,9 @@ function updateGameArea() {
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
     playerNameDisplayer.text = playerName
-    playerHPDisplayer.text = `player HP: ${playerHP}`
+    playerHPDisplayer.text = `${playerName} HP: ${playerHP}`
     enemyNameDisplayer.text = enemyName
-    enemyHPDisplayer.text = `enemy HP: ${enemyHP}`
+    enemyHPDisplayer.text = `${enemyName} HP: ${enemyHP}`
     if (!timeLeft || !playerHP || !enemyHP)
         gameArea.stop()
     playerNameDisplayer.x = player.x

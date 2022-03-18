@@ -7,33 +7,33 @@ let ground
 
 function start() {
     gameArea.start()
-    player = new Character('rect', 0, 50, 20, 20, 'red', 'player');
-    do {
-        playerName = prompt('Enter your name')
-    }
-    while (playerName == '' || !playerName);
-    playerNameDisplayer = new Component('text', 0, 0, '5px', 'Consolas', 'red')
+    player = new Character('rect', 0, 50, 60, 60, 'red', 'player');
+    // do {
+    //     playerName = prompt('Enter your name')
+    // }
+    // while (playerName == '' || !playerName);
+    playerNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'red')
     playerHP = 10
-    playerSpeed = 2
-    playerJumpSpeed = 2.5
-    playerHPDisplayer = new Component('text', 5, 15, '10px', 'Consolas', 'black')
-    enemy = new Character('rect', gameArea.canvas.width - 20, 50, 20, 20, 'black');
-    do {
-        enemyName = prompt('Enter your enemy name')
-    }
-    while (enemyName == '' || !enemyName);
+    playerSpeed = 3.5
+    playerJumpSpeed = 4.5
+    playerHPDisplayer = new Component('text', 15, 45, '30px', 'Consolas', 'black')
+    enemy = new Character('rect', gameArea.canvas.width - 20, 50, 60, 60, 'black');
+    // do {
+    //     enemyName = prompt('Enter your enemy name')
+    // }
+    // while (enemyName == '' || !enemyName);
     if (playerName == enemyName) {
         playerName += ' (player)'
         enemyName += ' (enemy)'
     }
-    enemyNameDisplayer = new Component('text', 0, 0, '5px', 'Consolas', 'black')
+    enemyNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'black')
     enemyHP = 10
-    enemySpeed = 1
-    enemyJumpSpeed = 1.5
-    enemyHPDisplayer = new Component('text', 5, 35, '10px', 'Consolas', 'black')
+    enemySpeed = 2.5
+    enemyJumpSpeed = 2.5
+    enemyHPDisplayer = new Component('text', 15, 95, '30px', 'Consolas', 'black')
     timeLeft = 60
-    timeLeftDisplayer = new Component('text', gameArea.canvas.width - 80, 15, '10px', 'Consolas', 'black')
-    ground = new Component('rect', 0, gameArea.canvas.height - 30, gameArea.canvas.width, 30, 'green')
+    timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black')
+    ground = new Component('rect', 0, gameArea.canvas.height - 120, gameArea.canvas.width, 120, 'green')
     components.push(ground)
     components.push(playerNameDisplayer)
     components.push(playerHPDisplayer)
@@ -49,8 +49,8 @@ let gameArea = {
     canvas: document.getElementById('canvas'),
     start: function () {
         document.getElementById('filter').style.display = 'none'
-        this.canvas.width = 300
-        this.canvas.height = 150
+        this.canvas.width = this.canvas.offsetWidth
+        this.canvas.height = this.canvas.offsetHeight
         this.ctx = this.canvas.getContext('2d')
         // this.ctx.scale(2, 2)
         this.interval = setInterval(updateGameArea, 10);
@@ -246,9 +246,9 @@ function updateGameArea() {
     if (!timeLeft || !playerHP || !enemyHP)
         gameArea.stop()
     playerNameDisplayer.x = player.x
-    playerNameDisplayer.y = player.y - 5
+    playerNameDisplayer.y = player.y - 15
     enemyNameDisplayer.x = enemy.x
-    enemyNameDisplayer.y = enemy.y - 5
+    enemyNameDisplayer.y = enemy.y - 15
     components.map(component => {
         component.draw()
     })

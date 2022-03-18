@@ -14,8 +14,8 @@ function start() {
     while (playerName == '' || !playerName);
     playerNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'red')
     playerHP = 10
-    playerSpeed = 4
-    playerJumpSpeed = 4.5
+    playerSpeed = 5
+    playerJumpSpeed = 6.5
     playerHPDisplayer = new Component('text', 15, 45, '30px', 'Consolas', 'black')
     enemy = new Character('rect', gameArea.canvas.width - 20, 200, 60, 60, 'black');
     do {
@@ -29,7 +29,7 @@ function start() {
     enemyNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'black')
     enemyHP = 10
     enemySpeed = 3
-    enemyJumpSpeed = 3
+    enemyJumpSpeed = 4.5
     enemyHPDisplayer = new Component('text', 15, 95, '30px', 'Consolas', 'black')
     timeLeft = 60
     timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black')
@@ -151,7 +151,7 @@ class Character extends Component {
         this.name = name
         this.speedX = 0
         this.speedY = 0
-        this.gravity = 0.05;
+        this.gravity = 0.1;
         this.gravitySpeed = 0;
     }
     newPos() {
@@ -164,8 +164,8 @@ class Character extends Component {
         enemyAI()
     }
     hitBottom() {
-        if (this.y > ground.y - 15) {
-            this.y = ground.y - 15;
+        if (this.y > ground.y - 30) {
+            this.y = ground.y - 30;
             this.gravitySpeed = 0
         }
     }

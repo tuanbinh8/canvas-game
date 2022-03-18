@@ -49,10 +49,9 @@ let gameArea = {
     canvas: document.getElementById('canvas'),
     start: function () {
         document.getElementById('filter').style.display = 'none'
-        this.canvas.width = this.canvas.offsetWidth
-        this.canvas.height = this.canvas.offsetHeight
+        this.canvas.width = 1280
+        this.canvas.height = 577
         this.ctx = this.canvas.getContext('2d')
-        // this.ctx.scale(2, 2)
         this.interval = setInterval(updateGameArea, 10);
         this.timeInterval = setInterval(() => {
             timeLeft--
@@ -103,8 +102,14 @@ class Component {
         if (this.type == 'image') {
             let image = new Image()
             image.src = this.color
-            image.onload = () => {
-                this.ctx.drawImage(image, this.x, this.y, this.width, this.height);
+            if (this.width !== undefined && this.height !== undefined) {
+                image.onload = () => {
+                    this.ctx.drawImage(image, this.x, this.y, this.width, this.height);
+                }
+            } else {
+                image.onload = () => {
+                    this.ctx.drawImage(image, this.x, this.y);
+                }
             }
         }
         if (this.type == 'text') {
@@ -219,9 +224,6 @@ function updateGameArea() {
         enemy.y = 200
         playerHP--
     }
-    // if (enemy.clicked()) {
-    //     enemyHP--
-    // }
     gameArea.clear();
     drawBackground('rect', 'lightblue')
     player.speedX = 0;

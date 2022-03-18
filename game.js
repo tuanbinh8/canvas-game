@@ -7,29 +7,29 @@ let ground
 
 function start() {
     gameArea.start()
-    player = new Character('rect', 0, 50, 60, 60, 'red', 'player');
-    // do {
-    //     playerName = prompt('Enter your name')
-    // }
-    // while (playerName == '' || !playerName);
+    player = new Character('rect', 0, 200, 60, 60, 'red', 'player');
+    do {
+        playerName = prompt('Enter your name')
+    }
+    while (playerName == '' || !playerName);
     playerNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'red')
     playerHP = 10
-    playerSpeed = 3.5
+    playerSpeed = 4
     playerJumpSpeed = 4.5
     playerHPDisplayer = new Component('text', 15, 45, '30px', 'Consolas', 'black')
-    enemy = new Character('rect', gameArea.canvas.width - 20, 50, 60, 60, 'black');
-    // do {
-    //     enemyName = prompt('Enter your enemy name')
-    // }
-    // while (enemyName == '' || !enemyName);
+    enemy = new Character('rect', gameArea.canvas.width - 20, 200, 60, 60, 'black');
+    do {
+        enemyName = prompt('Enter your enemy name')
+    }
+    while (enemyName == '' || !enemyName);
     if (playerName == enemyName) {
         playerName += ' (player)'
         enemyName += ' (enemy)'
     }
     enemyNameDisplayer = new Component('text', 0, 0, '20px', 'Consolas', 'black')
     enemyHP = 10
-    enemySpeed = 2.5
-    enemyJumpSpeed = 2.5
+    enemySpeed = 3
+    enemyJumpSpeed = 3
     enemyHPDisplayer = new Component('text', 15, 95, '30px', 'Consolas', 'black')
     timeLeft = 60
     timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black')
@@ -214,9 +214,9 @@ function enemyAI() {
 function updateGameArea() {
     if (player.touchWith(enemy)) {
         player.x = 0
-        player.y = 50
+        player.y = 200
         enemy.x = gameArea.canvas.width - 20
-        enemy.y = 50
+        enemy.y = 200
         playerHP--
     }
     // if (enemy.clicked()) {

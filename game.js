@@ -204,6 +204,10 @@ function drawBackground(type, color) {
     let background = new Component(type, 0, 0, gameArea.canvas.width, gameArea.canvas.height, color)
     background.draw()
 }
+function playSound(src) {
+    let audio = new Audio(src)
+    audio.play()
+}
 
 function enemyAI() {
     if (enemy.x < player.x)
@@ -218,6 +222,7 @@ function enemyAI() {
 
 function updateGameArea() {
     if (player.touchWith(enemy)) {
+        playSound('diesound.mp3')
         player.x = 0
         player.y = 200
         enemy.x = gameArea.canvas.width - 20

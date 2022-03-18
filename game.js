@@ -42,7 +42,7 @@ function start() {
     components.push(timeLeftDisplayer)
     characters.push(player)
     characters.push(enemy)
-
+    playSound('gametheme.mp3',true)
 }
 
 let gameArea = {
@@ -204,9 +204,10 @@ function drawBackground(type, color) {
     let background = new Component(type, 0, 0, gameArea.canvas.width, gameArea.canvas.height, color)
     background.draw()
 }
-function playSound(src) {
+function playSound(src, loop) {
     let audio = new Audio(src)
     audio.play()
+    audio.loop == loop
 }
 
 function enemyAI() {
@@ -222,7 +223,7 @@ function enemyAI() {
 
 function updateGameArea() {
     if (player.touchWith(enemy)) {
-        playSound('diesound.mp3')
+        playSound('diesound.mp3', false)
         player.x = 0
         player.y = 200
         enemy.x = gameArea.canvas.width - 20

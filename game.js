@@ -65,8 +65,10 @@ let gameArea = {
             gameArea.keys[event.keyCode] = (event.type == "keydown");
         }
         window.addEventListener("visibilitychange", () => {
-            if (document.visibilityState !== "visible")
-                pause()
+            if (timeLeft && playerHP && enemyHP) {
+                if (document.visibilityState !== "visible")
+                    pause()
+            }
         });
         this.canvas.onmousedown = (event) => {
             gameArea.mouseX = event.clientX - gameArea.canvas.offsetLeft
@@ -82,9 +84,13 @@ let gameArea = {
     },
     stop: function () {
         clearInterval(this.interval);
+        clearInterval(this.timeInterval);
     },
     continue: function () {
         this.interval = setInterval(updateGameArea, 10);
+        this.timeInterval = setInterval(() => {
+            timeLeft--
+        }, 1000);
         document.getElementById('filter').style.display = 'none'
         document.getElementById('continue-button').style.display = 'none'
     },

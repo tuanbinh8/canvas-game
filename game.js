@@ -6,6 +6,8 @@ let timeLeft, timeLeftDisplayer
 let ground
 
 function start() {
+    document.getElementById('filter').style.display = 'none'
+    document.getElementById('play-button').style.display = 'none'
     gameArea.start()
     player = new Character('rect', 0, 200, 60, 60, 'red', 'player');
     do {
@@ -42,13 +44,12 @@ function start() {
     components.push(timeLeftDisplayer)
     characters.push(player)
     characters.push(enemy)
-    playSound('gametheme.mp3',true)
+    // playSound('gametheme.mp3', true, 2)
 }
 
 let gameArea = {
     canvas: document.getElementById('canvas'),
     start: function () {
-        document.getElementById('filter').style.display = 'none'
         this.canvas.width = 1280
         this.canvas.height = 577
         this.ctx = this.canvas.getContext('2d')
@@ -63,6 +64,10 @@ let gameArea = {
         window.onkeyup = (event) => {
             gameArea.keys[event.keyCode] = (event.type == "keydown");
         }
+        window.addEventListener("visibilitychange", () => {
+            if (document.visibilityState !== "visible")
+                pause()
+        });
         this.canvas.onmousedown = (event) => {
             gameArea.mouseX = event.clientX - gameArea.canvas.offsetLeft
             gameArea.mouseY = event.clientY - gameArea.canvas.offsetTop
@@ -77,7 +82,12 @@ let gameArea = {
     },
     stop: function () {
         clearInterval(this.interval);
-    }
+    },
+    continue: function () {
+        this.interval = setInterval(updateGameArea, 10);
+        document.getElementById('filter').style.display = 'none'
+        document.getElementById('continue-button').style.display = 'none'
+    },
 }
 
 class Component {
@@ -204,10 +214,16 @@ function drawBackground(type, color) {
     let background = new Component(type, 0, 0, gameArea.canvas.width, gameArea.canvas.height, color)
     background.draw()
 }
-function playSound(src, loop) {
+function playSound(src, loop, volume) {
     let audio = new Audio(src)
-    audio.play()
+    audio.volume = volume / 100
     audio.loop == loop
+    audio.play()
+}
+function pause() {
+    document.getElementById('filter').style.display = 'flex'
+    document.getElementById('continue-button').style.display = 'block'
+    gameArea.stop()
 }
 
 function enemyAI() {
@@ -223,7 +239,7 @@ function enemyAI() {
 
 function updateGameArea() {
     if (player.touchWith(enemy)) {
-        playSound('diesound.mp3', false)
+        playSound('diesound.mp3', false, 100)
         player.x = 0
         player.y = 200
         enemy.x = gameArea.canvas.width - 20
@@ -245,6 +261,9 @@ function updateGameArea() {
     }
     if (gameArea.keys && gameArea.keys[40]) {
         player.moveDown(playerJumpSpeed)
+    }
+    if (gameArea.keys && gameArea.keys[27]) {
+        pause()
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
     playerNameDisplayer.text = playerName

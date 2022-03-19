@@ -38,7 +38,7 @@
             align-items: center;
         }
 
-        #play-button {
+        #filter button {
             background-color: orange;
             padding: 15px;
             border: none;
@@ -53,11 +53,12 @@
     </style>
 </head>
 
-<body>
+<body onbeforeunload="pause()">
     <div id="container">
         <canvas id="canvas"></canvas>
         <div id="filter">
             <button id="play-button" onclick="start()">Play</button>
+            <button id="continue-button" onclick="gameArea.continue()" style="display: none;">Continue</button>
         </div>
     </div>
 </body>

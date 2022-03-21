@@ -1,11 +1,12 @@
 let components = []
 let characters = []
-let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDisplayer, playerHPDisplayer
-let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer
+let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDisplayer, playerHPDisplayer, playerDirection
+let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer, enemyDirection
 let timeLeft, timeLeftDisplayer
 let ground
 
 function start() {
+    document.body.style.backgroundColor = 'black'
     document.getElementById('filter').style.display = 'none'
     document.getElementById('play-button').style.display = 'none'
     gameArea.start()
@@ -19,6 +20,7 @@ function start() {
     playerSpeed = 5
     playerJumpSpeed = 6.5
     playerHPDisplayer = new Component('text', 15, 45, '30px', 'Consolas', 'black')
+    playerDirection = 'right'
     enemy = new Character('rect', gameArea.canvas.width - 20, 200, 60, 60, 'black');
     do {
         enemyName = prompt('Enter your enemy name')
@@ -33,6 +35,7 @@ function start() {
     enemySpeed = 3
     enemyJumpSpeed = 4.5
     enemyHPDisplayer = new Component('text', 15, 95, '30px', 'Consolas', 'black')
+    enemyDirection = 'left'
     timeLeft = 60
     timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black')
     ground = new Component('rect', 0, gameArea.canvas.height - 120, gameArea.canvas.width, 120, 'green')
@@ -50,8 +53,6 @@ function start() {
 let gameArea = {
     canvas: document.getElementById('canvas'),
     start: function () {
-        this.canvas.width = 1280
-        this.canvas.height = 577
         this.ctx = this.canvas.getContext('2d')
         this.interval = setInterval(updateGameArea, 10);
         this.timeInterval = setInterval(() => {
@@ -117,7 +118,7 @@ class Component {
         }
         if (this.type == 'image') {
             let image = new Image()
-            image.src = this.color
+            image.src = `image/${this.color}`
             if (this.width !== undefined && this.height !== undefined) {
                 image.onload = () => {
                     this.ctx.drawImage(image, this.x, this.y, this.width, this.height);
@@ -221,7 +222,7 @@ function drawBackground(type, color) {
     background.draw()
 }
 function playSound(src, loop, volume) {
-    let audio = new Audio(src)
+    let audio = new Audio(`sound/${src}`)
     audio.volume = volume / 100
     audio.loop == loop
     audio.play()
@@ -233,10 +234,14 @@ function pause() {
 }
 
 function enemyAI() {
-    if (enemy.x < player.x)
+    if (enemy.x < player.x) {
         enemy.moveRight(enemySpeed)
-    if (enemy.x > player.x)
+        enemyDirection = 'right'
+    }
+    if (enemy.x > player.x) {
         enemy.moveLeft(enemySpeed)
+        enemyDirection = 'left'
+    }
     if (enemy.y > player.y)
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
@@ -256,19 +261,21 @@ function updateGameArea() {
     drawBackground('rect', 'lightblue')
     player.speedX = 0;
     player.speedY = 0;
-    if (gameArea.keys && gameArea.keys[37]) {
+    if (keyDown(37)) {
         player.moveLeft(playerSpeed)
+        playerDirection = 'left'
     }
-    if (gameArea.keys && gameArea.keys[39]) {
+    if (keyDown(39)) {
         player.moveRight(playerSpeed)
+        playerDirection = 'right'
     }
-    if (gameArea.keys && gameArea.keys[38]) {
+    if (keyDown(38)) {
         player.moveUp(playerJumpSpeed)
     }
-    if (gameArea.keys && gameArea.keys[40]) {
+    if (keyDown(40)) {
         player.moveDown(playerJumpSpeed)
     }
-    if (gameArea.keys && gameArea.keys[27]) {
+    if (keyDown(27)) {
         pause()
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
@@ -289,4 +296,8 @@ function updateGameArea() {
         character.newPos()
         character.draw()
     })
+}
+function keyDown(keyCode) {
+    if (gameArea.keys && gameArea.keys[keyCode]) return true
+    return false
 }

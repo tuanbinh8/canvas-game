@@ -22,20 +22,16 @@
             height: 100vh;
         }
 
-        canvas {
-            width: 100%;
-            height: 100%;
-        }
-
         #filter {
             position: absolute;
             opacity: 0.6;
             background-color: black;
-            width: 100%;
-            height: 100%;
+            width: 1280px;
+            height: 577px;
             display: flex;
             justify-content: center;
             align-items: center;
+            z-index: 999999;
         }
 
         #filter button {
@@ -55,7 +51,7 @@
 
 <body onbeforeunload="pause()">
     <div id="container">
-        <canvas id="canvas"></canvas>
+        <canvas id="canvas" width="1280" height="577"></canvas>
         <div id="filter">
             <button id="play-button" onclick="start()">Play</button>
             <button id="continue-button" onclick="gameArea.continue()" style="display: none;">Continue</button>

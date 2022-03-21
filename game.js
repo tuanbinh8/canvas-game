@@ -47,7 +47,6 @@ function start() {
     components.push(timeLeftDisplayer)
     characters.push(player)
     characters.push(enemy)
-    // playSound('gametheme.mp3', true, 2)
 }
 
 let gameArea = {

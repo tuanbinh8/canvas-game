@@ -257,8 +257,6 @@ function updateGameArea() {
         enemy.y = 200
         playerHP--
     }
-    gameArea.clear();
-    drawBackground('rect', 'lightblue')
     player.speedX = 0;
     player.speedY = 0;
     if (keyDown(37)) {
@@ -289,6 +287,8 @@ function updateGameArea() {
     playerNameDisplayer.y = player.y - 15
     enemyNameDisplayer.x = enemy.x
     enemyNameDisplayer.y = enemy.y - 15
+    gameArea.clear();
+    drawBackground('rect', 'lightblue')
     components.map(component => {
         component.draw()
     })

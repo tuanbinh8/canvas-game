@@ -4,7 +4,7 @@ let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDispla
 let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer, enemyDirection
 let timeLeft, timeLeftDisplayer
 let ground
-let circle, active
+let circle, circleSpeed, circleDirection
 
 function start() {
     document.getElementById('filter').style.display = 'none'
@@ -39,7 +39,9 @@ function start() {
     timeLeft = 60
     timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black', true)
     ground = new Component('rect', 0, gameArea.canvas.height - 120, gameArea.canvas.width, 120, 'green', true)
-    circle = new Component('circle', 0, 0, 10, undefined, 'rgba(0,0,0,1)', true)
+    circle = new Component('circle', 0, 0, 10, undefined, 'black', true)
+    circleSpeed = 10
+    circleDirection = playerDirection
     active = true
     addComponent(false, ground)
     addComponent(false, playerNameDisplayer)
@@ -103,12 +105,17 @@ function addComponent(isCharacter, component) {
     if (isCharacter)
         characters.push(component)
 }
-function deleteComponent(isCharacter, component) {
+function deleteComponent(component) {
     if (components.indexOf(component) > -1) {
         components.splice(components.indexOf(component), 1)
-        if (isCharacter)
+        if (characters.indexOf(component) > -1)
             characters.splice(characters.indexOf(component), 1)
     }
+}
+
+function isComponent(component) {
+    if (components.indexOf(component) > -1) return true
+    else return false
 }
 class Component {
     constructor(type, x, y, width, height, color, fill) {
@@ -282,8 +289,10 @@ function enemyAI() {
 function resetStage() {
     player.x = 0
     player.y = 200
-    enemy.x = gameArea.canvas.width - 20
+    enemy.x = gameArea.canvas.width - 60
     enemy.y = 200
+    playerDirection = 'right'
+    enemyDirection = 'left'
 }
 
 function updateGameArea() {
@@ -293,11 +302,18 @@ function updateGameArea() {
         playerHP--
     }
     if (enemy.touchWith(circle)) {
-        circle.width = 0
         if (components.indexOf(circle) > -1)
-            deleteComponent(false, circle)
+            deleteComponent(circle)
         resetStage()
         enemyHP--
+    }
+    if (isComponent(circle)) {
+        if (circleDirection == 'right')
+            circle.x += circleSpeed
+        else
+            circle.x -= circleSpeed
+        if (circle.x > gameArea.canvas.width || circle.x < 0)
+            deleteComponent(circle)
     }
     player.speedX = 0;
     player.speedY = 0;
@@ -319,27 +335,14 @@ function updateGameArea() {
         pause()
     }
     if (keyDown(32)) {
-        if (active) {
-            active = false
-            setTimeout(() => {
-                active = true
-            }, 5000)
-            circle.x = player.x + player.width / 2
+        if (!isComponent(circle)) {
+            circleDirection = playerDirection
+            if (circleDirection == 'right')
+                circle.x = player.x + player.width
+            else
+                circle.x = player.x
             circle.y = player.y + player.height / 2
             addComponent(false, circle)
-            let r = 10
-            let a = 1
-            growingCircle()
-            function growingCircle() {
-                r++
-                a -= 0.001
-                circle.width = r
-                circle.color = `rgba(0,0,0,${a})`
-                if (a > 0)
-                    requestAnimationFrame(growingCircle)
-                else
-                    deleteComponent(false, circle)
-            }
         }
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`

@@ -5,6 +5,7 @@ let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, e
 let timeLeft, timeLeftDisplayer
 let ground
 let circle, circleSpeed, circleDirection
+let gametheme, diesound
 
 function start() {
     document.getElementById('filter').style.display = 'none'
@@ -42,15 +43,25 @@ function start() {
     circle = new Component('circle', 0, 0, 10, undefined, 'black', true)
     circleSpeed = 10
     circleDirection = playerDirection
-    active = true
-    addComponent(false, ground)
-    addComponent(false, playerNameDisplayer)
-    addComponent(false, playerHPDisplayer)
-    addComponent(false, enemyNameDisplayer)
-    addComponent(false, enemyHPDisplayer)
-    addComponent(false, timeLeftDisplayer)
-    addComponent(true, player)
-    addComponent(true, enemy)
+    gametheme = new Sound('gametheme.mp3', 20, true)
+    diesound = new Sound('diesound.mp3', 100, false)
+    ground.addComponent()
+    playerNameDisplayer.addComponent()
+    playerHPDisplayer.addComponent()
+    enemyNameDisplayer.addComponent()
+    enemyHPDisplayer.addComponent()
+    timeLeftDisplayer.addComponent()
+    player.addComponent()
+    enemy.addComponent()
+    // addComponent(false, ground)
+    // addComponent(false, playerNameDisplayer)
+    // addComponent(false, playerHPDisplayer)
+    // addComponent(false, enemyNameDisplayer)
+    // addComponent(false, enemyHPDisplayer)
+    // addComponent(false, timeLeftDisplayer)
+    // addComponent(true, player)
+    // addComponent(true, enemy)
+    gametheme.play()
 }
 
 let gameArea = {
@@ -95,28 +106,14 @@ let gameArea = {
         this.timeInterval = setInterval(() => {
             timeLeft--
         }, 1000);
+        gametheme.play()
         document.getElementById('filter').style.display = 'none'
         document.getElementById('continue-button').style.display = 'none'
     },
 }
 
-function addComponent(isCharacter, component) {
-    components.push(component)
-    if (isCharacter)
-        characters.push(component)
-}
-function deleteComponent(component) {
-    if (components.indexOf(component) > -1) {
-        components.splice(components.indexOf(component), 1)
-        if (characters.indexOf(component) > -1)
-            characters.splice(characters.indexOf(component), 1)
-    }
-}
 
-function isComponent(component) {
-    if (components.indexOf(component) > -1) return true
-    else return false
-}
+
 class Component {
     constructor(type, x, y, width, height, color, fill) {
         this.ctx = gameArea.ctx
@@ -200,6 +197,17 @@ class Component {
             return touch;
         } else return false
     }
+    addComponent() {
+        components.push(this)
+    }
+    isComponent() {
+        if (components.indexOf(this) > -1) return true
+        else return false
+    }
+    deleteComponent() {
+        if (components.indexOf(this) > -1)
+            components.splice(components.indexOf(this), 1)
+    }
 }
 
 class Character extends Component {
@@ -250,22 +258,43 @@ class Character extends Component {
     moveRight(speed) {
         this.speedX = speed;
     }
+    addComponent() {
+        components.push(this)
+        characters.push(this)
+    }
+    deleteComponent() {
+        if (components.indexOf(this) > -1) {
+            components.splice(components.indexOf(this), 1)
+            characters.splice(characters.indexOf(this), 1)
+        }
+    }
+}
+
+class Sound {
+    constructor(src, volume, loop) {
+        this.audio = new Audio('sound/' + src)
+        this.volume = volume
+        this.loop = loop
+    }
+    play() {
+        this.audio.volume = this.volume / 100
+        this.audio.loop = this.loop
+        this.audio.play()
+    }
+    pause() {
+        this.audio.pause()
+    }
 }
 
 function drawBackground(type, color) {
     let background = new Component(type, 0, 0, gameArea.canvas.width, gameArea.canvas.height, color, true)
     background.draw()
 }
-function playSound(src, loop, volume) {
-    let audio = new Audio(`sound/${src}`)
-    audio.volume = volume / 100
-    audio.loop == loop
-    audio.play()
-}
 function pause() {
     document.getElementById('filter').style.display = 'flex'
     document.getElementById('continue-button').style.display = 'block'
     gameArea.stop()
+    gametheme.pause()
 }
 
 function enemyAI() {
@@ -284,7 +313,7 @@ function enemyAI() {
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
         enemy.moveDown(enemyJumpSpeed)
-    if (isComponent(circle)) {
+    if (circle.isComponent()) {
         let distanceFromCircle
         if (enemy.x < circle.x) {
             distanceFromCircle = circle.x - (enemy.x + enemy.width)
@@ -312,23 +341,23 @@ function resetStage() {
 
 function updateGameArea() {
     if (player.touchWith(enemy)) {
-        playSound('diesound.mp3', false, 100)
+        diesound.play()
         resetStage()
         playerHP--
     }
     if (enemy.touchWith(circle)) {
         if (components.indexOf(circle) > -1)
-            deleteComponent(circle)
+            circle.deleteComponent()
         resetStage()
         enemyHP--
     }
-    if (isComponent(circle)) {
+    if (circle.isComponent()) {
         if (circleDirection == 'right')
             circle.x += circleSpeed
         else
             circle.x -= circleSpeed
         if (circle.x > gameArea.canvas.width || circle.x < 0)
-            deleteComponent(circle)
+            circle.deleteComponent()
     }
     player.speedX = 0;
     player.speedY = 0;
@@ -350,14 +379,14 @@ function updateGameArea() {
         pause()
     }
     if (keyDown(32)) {
-        if (!isComponent(circle)) {
+        if (!circle.isComponent()) {
             circleDirection = playerDirection
             if (circleDirection == 'right')
                 circle.x = player.x + player.width
             else
                 circle.x = player.x
             circle.y = player.y + player.height / 2
-            addComponent(false, circle)
+            circle.addComponent()
         }
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
@@ -365,8 +394,10 @@ function updateGameArea() {
     playerHPDisplayer.text = `${playerName} HP: ${playerHP}`
     enemyNameDisplayer.text = enemyName
     enemyHPDisplayer.text = `${enemyName} HP: ${enemyHP}`
-    if (!timeLeft || !playerHP || !enemyHP)
+    if (!timeLeft || !playerHP || !enemyHP) {
         gameArea.stop()
+        gametheme.pause()
+    }
     playerNameDisplayer.x = player.x
     playerNameDisplayer.y = player.y - 15
     enemyNameDisplayer.x = enemy.x

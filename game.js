@@ -269,15 +269,18 @@ function pause() {
 }
 
 function enemyAI() {
+    let distanceFromPlayer
     if (enemy.x < player.x) {
+        distanceFromPlayer = player.x - (enemy.x + enemy.width)
         enemy.moveRight(enemySpeed)
         enemyDirection = 'right'
     }
     if (enemy.x > player.x) {
+        distanceFromPlayer = enemy.x - (player.x + player.width)
         enemy.moveLeft(enemySpeed)
         enemyDirection = 'left'
     }
-    if (enemy.y > player.y)
+    if (enemy.y > player.y && distanceFromPlayer < 200)
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
         enemy.moveDown(enemyJumpSpeed)
@@ -289,8 +292,12 @@ function enemyAI() {
         if (enemy.x > circle.x) {
             distanceFromCircle = enemy.x - (circle.x + circle.width)
         }
-        if (distanceFromCircle < 200)
-            enemy.moveUp(enemyJumpSpeed)
+        if (distanceFromCircle < 200 && !(circle.y + circle.height < enemy.y)) {
+            if (enemy.y > ground.y - 30)
+                enemy.moveDown(enemyJumpSpeed)
+            else
+                enemy.moveUp(enemyJumpSpeed)
+        }
     }
 }
 

@@ -281,6 +281,17 @@ function enemyAI() {
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
         enemy.moveDown(enemyJumpSpeed)
+    if (isComponent(circle)) {
+        let distanceFromCircle
+        if (enemy.x < circle.x) {
+            distanceFromCircle = circle.x - (enemy.x + enemy.width)
+        }
+        if (enemy.x > circle.x) {
+            distanceFromCircle = enemy.x - (circle.x + circle.width)
+        }
+        if (distanceFromCircle < 200)
+            enemy.moveUp(enemyJumpSpeed)
+    }
 }
 
 function resetStage() {

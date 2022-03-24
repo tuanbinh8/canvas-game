@@ -127,10 +127,6 @@ class Component {
         this.height = height
         this.color = color
         this.fill = fill
-        this.left = this.x;
-        this.right = this.x + (this.width);
-        this.top = this.y;
-        this.bottom = this.y + (this.height);
     }
     draw() {
         if (this.type == 'rect') {
@@ -162,6 +158,7 @@ class Component {
         if (this.type == 'circle') {
             this.ctx.beginPath();
             this.ctx.arc(this.x, this.y, this.width, 0, 2 * Math.PI);
+            this.height = this.width
             this.ctx.strokeStyle = this.color
             this.ctx.stroke();
             if (this.fill) {

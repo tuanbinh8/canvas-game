@@ -348,6 +348,7 @@ function updateGameArea() {
     }
     if (enemy.touchWith(bullet)) {
         bullet.deleteComponent()
+        diesound.play()
         resetStage()
         enemyHP--
     }

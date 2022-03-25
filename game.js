@@ -4,8 +4,9 @@ let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDispla
 let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer, enemyDirection
 let timeLeft, timeLeftDisplayer
 let ground
-let circle, circleSpeed, circleDirection
+let bullet, bulletSpeed, bulletDirection
 let gametheme, diesound
+let resultMessage
 
 function start() {
     document.getElementById('filter').style.display = 'none'
@@ -40,11 +41,12 @@ function start() {
     timeLeft = 60
     timeLeftDisplayer = new Component('text', gameArea.canvas.width - 250, 45, '30px', 'Consolas', 'black', true)
     ground = new Component('rect', 0, gameArea.canvas.height - 120, gameArea.canvas.width, 120, 'green', true)
-    circle = new Component('circle', 0, 0, 10, undefined, 'black', true)
-    circleSpeed = 10
-    circleDirection = playerDirection
+    bullet = new Component('circle', 0, 0, 10, undefined, 'black', true)
+    bulletSpeed = 10
+    bulletDirection = playerDirection
     gametheme = new Sound('gametheme.mp3', 20, true)
     diesound = new Sound('diesound.mp3', 100, false)
+    resultMessage = new Component('text', gameArea.canvas.width / 2, gameArea.canvas.height / 2, '100px', 'Consolas', 'black', false, 'center', 'middle')
     ground.addComponent()
     playerNameDisplayer.addComponent()
     playerHPDisplayer.addComponent()
@@ -53,14 +55,6 @@ function start() {
     timeLeftDisplayer.addComponent()
     player.addComponent()
     enemy.addComponent()
-    // addComponent(false, ground)
-    // addComponent(false, playerNameDisplayer)
-    // addComponent(false, playerHPDisplayer)
-    // addComponent(false, enemyNameDisplayer)
-    // addComponent(false, enemyHPDisplayer)
-    // addComponent(false, timeLeftDisplayer)
-    // addComponent(true, player)
-    // addComponent(true, enemy)
     gametheme.play()
 }
 
@@ -80,6 +74,7 @@ let gameArea = {
             gameArea.keys[event.keyCode] = false
         }
         window.addEventListener("visibilitychange", () => {
+            console.log(document.visibilityState);
             if (timeLeft && playerHP && enemyHP) {
                 if (document.visibilityState !== "visible")
                     pause()
@@ -115,7 +110,7 @@ let gameArea = {
 
 
 class Component {
-    constructor(type, x, y, width, height, color, fill) {
+    constructor(type, x, y, width, height, color, fill, textAlign, textBaseline) {
         this.ctx = gameArea.ctx
         this.type = type
         this.x = x
@@ -124,6 +119,8 @@ class Component {
         this.height = height
         this.color = color
         this.fill = fill
+        this.textAlign = textAlign
+        this.textBaseline = textBaseline
     }
     draw() {
         if (this.type == 'rect') {
@@ -150,6 +147,10 @@ class Component {
         if (this.type == 'text') {
             this.ctx.font = this.width + " " + this.height;
             this.ctx.fillStyle = this.color;
+            if (this.textAlign)
+                this.ctx.textAlign = this.textAlign
+            if (this.textBaseline)
+                this.ctx.textBaseline = this.textBaseline
             this.ctx.fillText(this.text, this.x, this.y);
         }
         if (this.type == 'circle') {
@@ -211,8 +212,8 @@ class Component {
 }
 
 class Character extends Component {
-    constructor(type, x, y, width, height, color, fill) {
-        super(type, x, y, width, height, color, fill)
+    constructor(type, x, y, width, height, color, fill, textAlign, textBaseline) {
+        super(type, x, y, width, height, color, fill, textAlign, textBaseline)
         this.ctx = gameArea.ctx
         this.speedX = 0
         this.speedY = 0
@@ -313,15 +314,15 @@ function enemyAI() {
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
         enemy.moveDown(enemyJumpSpeed)
-    if (circle.isComponent()) {
-        let distanceFromCircle
-        if (enemy.x < circle.x) {
-            distanceFromCircle = circle.x - (enemy.x + enemy.width)
+    if (bullet.isComponent()) {
+        let distanceFromBullet
+        if (enemy.x < bullet.x) {
+            distanceFromBullet = bullet.x - (enemy.x + enemy.width)
         }
-        if (enemy.x > circle.x) {
-            distanceFromCircle = enemy.x - (circle.x + circle.width)
+        if (enemy.x > bullet.x) {
+            distanceFromBullet = enemy.x - (bullet.x + bullet.width)
         }
-        if (distanceFromCircle < 200 && !(circle.y + circle.height < enemy.y)) {
+        if (distanceFromBullet < 200 && !(bullet.y + bullet.height < enemy.y)) {
             if (enemy.y > ground.y - 30)
                 enemy.moveDown(enemyJumpSpeed)
             else
@@ -345,19 +346,19 @@ function updateGameArea() {
         resetStage()
         playerHP--
     }
-    if (enemy.touchWith(circle)) {
-        if (components.indexOf(circle) > -1)
-            circle.deleteComponent()
+    if (enemy.touchWith(bullet)) {
+        bullet.deleteComponent()
         resetStage()
         enemyHP--
     }
-    if (circle.isComponent()) {
-        if (circleDirection == 'right')
-            circle.x += circleSpeed
+    bulletDirection = playerDirection
+    if (bullet.isComponent()) {
+        if (bulletDirection == 'right')
+            bullet.x += bulletSpeed
         else
-            circle.x -= circleSpeed
-        if (circle.x > gameArea.canvas.width || circle.x < 0)
-            circle.deleteComponent()
+            bullet.x -= bulletSpeed
+        if (bullet.x > gameArea.canvas.width || bullet.x < 0)
+            bullet.deleteComponent()
     }
     player.speedX = 0;
     player.speedY = 0;
@@ -379,14 +380,13 @@ function updateGameArea() {
         pause()
     }
     if (keyDown(32)) {
-        if (!circle.isComponent()) {
-            circleDirection = playerDirection
-            if (circleDirection == 'right')
-                circle.x = player.x + player.width
+        if (!bullet.isComponent()) {
+            if (bulletDirection == 'right')
+                bullet.x = player.x + player.width
             else
-                circle.x = player.x
-            circle.y = player.y + player.height / 2
-            circle.addComponent()
+                bullet.x = player.x
+            bullet.y = player.y + player.height / 2
+            bullet.addComponent()
         }
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
@@ -397,6 +397,18 @@ function updateGameArea() {
     if (!timeLeft || !playerHP || !enemyHP) {
         gameArea.stop()
         gametheme.pause()
+        if (playerHP < enemyHP) {
+            resultMessage.text = 'You lost'
+            resultMessage.addComponent()
+        }
+        if (playerHP == enemyHP) {
+            resultMessage.text = 'Tie'
+            resultMessage.addComponent()
+        }
+        if (playerHP > enemyHP) {
+            resultMessage.text = 'You won'
+            resultMessage.addComponent()
+        }
     }
     playerNameDisplayer.x = player.x
     playerNameDisplayer.y = player.y - 15

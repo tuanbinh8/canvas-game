@@ -4,8 +4,8 @@ let player, playerName, playerHP, playerSpeed, playerJumpSpeed, playerNameDispla
 let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, enemyHPDisplayer, enemyDirection
 let timeLeft, timeLeftDisplayer
 let ground
-let bullet, bulletSpeed, bulletDirection
-let gametheme, diesound
+let bullet, bulletSpeed, bulletDirection, bulletFired
+let gametheme, diesound, losesound
 let resultMessage
 
 function start() {
@@ -44,8 +44,10 @@ function start() {
     bullet = new Component('circle', 0, 0, 10, undefined, 'black', true)
     bulletSpeed = 10
     bulletDirection = playerDirection
+    bulletFired = false
     gametheme = new Sound('gametheme.mp3', 20, true)
     diesound = new Sound('diesound.mp3', 100, false)
+    losesound = new Sound('fart.mp3', 100, false)
     resultMessage = new Component('text', gameArea.canvas.width / 2, gameArea.canvas.height / 2, '100px', 'Consolas', 'black', false, 'center', 'middle')
     ground.addComponent()
     playerNameDisplayer.addComponent()
@@ -55,6 +57,7 @@ function start() {
     timeLeftDisplayer.addComponent()
     player.addComponent()
     enemy.addComponent()
+    bullet.addComponent()
     gametheme.play()
 }
 
@@ -314,7 +317,7 @@ function enemyAI() {
         enemy.moveUp(enemyJumpSpeed)
     if (enemy.y < player.y)
         enemy.moveDown(enemyJumpSpeed)
-    if (bullet.isComponent()) {
+    if (bulletFired) {
         let distanceFromBullet
         if (enemy.x < bullet.x) {
             distanceFromBullet = bullet.x - (enemy.x + enemy.width)
@@ -347,19 +350,27 @@ function updateGameArea() {
         playerHP--
     }
     if (enemy.touchWith(bullet)) {
-        bullet.deleteComponent()
-        diesound.play()
-        resetStage()
-        enemyHP--
+        if (bulletFired) {
+            bulletFired = false
+            diesound.play()
+            resetStage()
+            enemyHP--
+        }
     }
-    bulletDirection = playerDirection
-    if (bullet.isComponent()) {
+    if (!bulletFired) {
+        if (playerDirection == 'right')
+            bullet.x = player.x + player.width
+        else
+            bullet.x = player.x
+        bullet.y = player.y + player.height / 2
+    }
+    if (bulletFired) {
         if (bulletDirection == 'right')
             bullet.x += bulletSpeed
         else
             bullet.x -= bulletSpeed
         if (bullet.x > gameArea.canvas.width || bullet.x < 0)
-            bullet.deleteComponent()
+            bulletFired = false
     }
     player.speedX = 0;
     player.speedY = 0;
@@ -381,13 +392,14 @@ function updateGameArea() {
         pause()
     }
     if (keyDown(32)) {
-        if (!bullet.isComponent()) {
+        if (!bulletFired) {
+            bulletFired = true
+            bulletDirection = playerDirection
             if (bulletDirection == 'right')
                 bullet.x = player.x + player.width
             else
                 bullet.x = player.x
             bullet.y = player.y + player.height / 2
-            bullet.addComponent()
         }
     }
     timeLeftDisplayer.text = `time left: ${timeLeft}`
@@ -399,15 +411,16 @@ function updateGameArea() {
         gameArea.stop()
         gametheme.pause()
         if (playerHP < enemyHP) {
-            resultMessage.text = 'You lost'
+            losesound.play()
+            resultMessage.text = 'Defeat..'
             resultMessage.addComponent()
         }
         if (playerHP == enemyHP) {
-            resultMessage.text = 'Tie'
+            resultMessage.text = 'Tie!'
             resultMessage.addComponent()
         }
         if (playerHP > enemyHP) {
-            resultMessage.text = 'You won'
+            resultMessage.text = 'Victory!!!'
             resultMessage.addComponent()
         }
     }

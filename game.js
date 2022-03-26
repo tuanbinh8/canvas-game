@@ -5,7 +5,7 @@ let enemy, enemyName, enemyHP, enemySpeed, enemyJumpSpeed, enemyNameDisplayer, e
 let timeLeft, timeLeftDisplayer
 let ground
 let bullet, bulletSpeed, bulletDirection, bulletFired
-let gametheme, diesound, losesound
+let gametheme, diesound, losesound, victorysound
 let resultMessage
 
 function start() {
@@ -48,6 +48,7 @@ function start() {
     gametheme = new Sound('gametheme.mp3', 20, true)
     diesound = new Sound('diesound.mp3', 100, false)
     losesound = new Sound('fart.mp3', 100, false)
+    victorysound = new Sound('victorysound.mp3',20,false)
     resultMessage = new Component('text', gameArea.canvas.width / 2, gameArea.canvas.height / 2, '100px', 'Consolas', 'black', false, 'center', 'middle')
     ground.addComponent()
     playerNameDisplayer.addComponent()
@@ -420,6 +421,7 @@ function updateGameArea() {
             resultMessage.addComponent()
         }
         if (playerHP > enemyHP) {
+            victorysound.play()
             resultMessage.text = 'Victory!!!'
             resultMessage.addComponent()
         }

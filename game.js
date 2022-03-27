@@ -12,6 +12,29 @@ function start() {
     document.getElementById('filter').style.display = 'none'
     document.getElementById('play-button').style.display = 'none'
     gameArea.start()
+    window.onkeydown = (event) => {
+        gameArea.keys = (gameArea.keys || []);
+        gameArea.keys[event.keyCode] = true
+    }
+    window.onkeyup = (event) => {
+        gameArea.keys[event.keyCode] = false
+    }
+    window.onbeforeunload = () => { pause() }
+    window.addEventListener("visibilitychange", () => {
+        console.log(document.visibilityState);
+        if (timeLeft && playerHP && enemyHP) {
+            if (document.visibilityState !== "visible")
+                pause()
+        }
+    });
+    gameArea.canvas.onmousedown = (event) => {
+        gameArea.mouseX = event.clientX - gameArea.canvas.offsetLeft
+        gameArea.mouseY = event.clientY - gameArea.canvas.offsetTop
+    }
+    gameArea.canvas.onmouseup = () => {
+        gameArea.mouseX = undefined
+        gameArea.mouseY = undefined
+    }
     player = new Character('rect', 0, 200, 60, 60, 'red', true);
     do {
         playerName = prompt('Enter your name')
@@ -48,7 +71,7 @@ function start() {
     gametheme = new Sound('gametheme.mp3', 20, true)
     diesound = new Sound('diesound.mp3', 100, false)
     losesound = new Sound('fart.mp3', 100, false)
-    victorysound = new Sound('victorysound.mp3',20,false)
+    victorysound = new Sound('victorysound.mp3', 20, false)
     resultMessage = new Component('text', gameArea.canvas.width / 2, gameArea.canvas.height / 2, '100px', 'Consolas', 'black', false, 'center', 'middle')
     ground.addComponent()
     playerNameDisplayer.addComponent()
@@ -70,28 +93,6 @@ let gameArea = {
         this.timeInterval = setInterval(() => {
             timeLeft--
         }, 1000);
-        window.onkeydown = (event) => {
-            gameArea.keys = (gameArea.keys || []);
-            gameArea.keys[event.keyCode] = true
-        }
-        window.onkeyup = (event) => {
-            gameArea.keys[event.keyCode] = false
-        }
-        window.addEventListener("visibilitychange", () => {
-            console.log(document.visibilityState);
-            if (timeLeft && playerHP && enemyHP) {
-                if (document.visibilityState !== "visible")
-                    pause()
-            }
-        });
-        this.canvas.onmousedown = (event) => {
-            gameArea.mouseX = event.clientX - gameArea.canvas.offsetLeft
-            gameArea.mouseY = event.clientY - gameArea.canvas.offsetTop
-        }
-        this.canvas.onmouseup = () => {
-            gameArea.mouseX = undefined
-            gameArea.mouseY = undefined
-        }
     },
     clear: function () {
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -295,6 +296,7 @@ function drawBackground(type, color) {
     let background = new Component(type, 0, 0, gameArea.canvas.width, gameArea.canvas.height, color, true)
     background.draw()
 }
+
 function pause() {
     document.getElementById('filter').style.display = 'flex'
     document.getElementById('continue-button').style.display = 'block'
